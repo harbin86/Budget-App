@@ -72,7 +72,7 @@ var UIController = (function(){
 			return{
 				type: document.querySelector(DOMstrings.inputType).value,
 				description: document.querySelector(DOMstrings.inputDescription).value,
-				value: document.querySelector(DOMstrings.inputValue).value
+				value: parseFloat(document.querySelector(DOMstrings.inputValue).value) //convert value from string to decimal
 			};
 		},
 
@@ -103,6 +103,22 @@ var UIController = (function(){
 			document.querySelector(element).insertAdjacentHTML('beforeEnd', newHtml);
 		},
 
+		clearFields: function(){
+
+			var fields, fieldsArray;
+
+			fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
+
+			//Convert list to Array
+			fieldsArray = Array.prototype.slice.call(fields);
+
+			fieldsArray.forEach(function(current,index,array){
+				current.value = "";
+			});
+
+			fieldsArray[0].focus();
+		},
+
 		getDOMstrings: function(){
 			return DOMstrings;
 		}
@@ -126,16 +142,33 @@ var controller  = (function(budgetCtrl,UICtrl){
 		});
 	};
 	
+	var updateBudget = function(){
+
+	};
+
 	var ctrlAddItem = function(){
 		
 		//Get user input
 		var input = UICtrl.getInput();
 
-		//Add item to Budget Controller
-		var newItem = budgetCtrl.addItem(input.type, input.description, input.value);
+		if(input.description !== "" && !isNaN(input.value) && input.value > 0){
+			//Add item to Budget Controller
+			var newItem = budgetCtrl.addItem(input.type, input.description, input.value);
+			
+			//Add item to the UI
+			UICtrl.addListItem(newItem,input.type);
+
+			/*document.querySelector('.add__description').value = "";
+			document.querySelector('.add__value').value = "";*/
+
+			//Clear fields
+			UICtrl.clearFields();
+
+			//Update Budget
+			updateBudget();
+		}
 		
-		//Add item to the UI
-		UICtrl.addListItem(newItem,input.type);
+
 	};
 
 	return{
